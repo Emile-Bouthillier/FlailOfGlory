@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class MouseDisplay : MonoBehaviour
+public class FlailHead : MonoBehaviour
 {
     public Rigidbody2D rbmouse;
     private Transform playerPosition;
@@ -36,7 +36,7 @@ public class MouseDisplay : MonoBehaviour
         SpriteRenderer followerSprite = rbmouse.gameObject.GetComponent<SpriteRenderer>();
         if (playerToMouse2D.sqrMagnitude > mousefollowerDist)
         {
-            followerSprite.color = Color.black;
+            followerSprite.color = Color.red;
         }
         else { followerSprite.color = Color.white; }
         
