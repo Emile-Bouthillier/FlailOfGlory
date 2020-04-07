@@ -16,6 +16,10 @@ public class MorningStarWhip : MonoBehaviour
     private float lineWidth = 0.1f;
     // Declare a variable of type Transform
     private Transform playerPosition;
+    // Declare a variable for the whip direction
+    private Vector2 directionWhip = new Vector2(0f, 0f);
+    // Declare a flag to detect when a whip acction has happened
+    private bool whipped = false;
 
     // Start is called before the first frame update
     void Start()
@@ -75,10 +79,33 @@ public class MorningStarWhip : MonoBehaviour
 
     private void Simulate()
     {
-        // Set Gravity to control the rope. 
-        //TODO: Change the Gravity logic in a Coil logic for the MornigStar Whip
-        //TODO: Use the mouse to act as a gravity well when attacking ?
-        Vector2 forceGravity = new Vector2(0f, 0f);
+        // Get the whip direction
+        directionWhip.x = Camera.main.ScreenToWorldPoint(Input.mousePosition).x - playerPosition.position.x;
+        directionWhip.y = Camera.main.ScreenToWorldPoint(Input.mousePosition).y - playerPosition.position.y;
+
+        // Whip only if certain conditions are filled
+        if (directionWhip.sqrMagnitude > 9 && !whipped)
+        {
+            Whip();
+        }
+        else // Retract the whip towards the player
+        {
+            if (directionWhip.sqrMagnitude < 9)
+            {
+                whipped = false;
+            }
+
+            Retract();
+        }
+    }
+
+    private void Whip()
+    {
+        // Use the mouse to act as a pulling force on the whip when attacking
+        Vector2 forceWhip;
+
+        // Set a force to control the whip
+        forceWhip = directionWhip.normalized * 30;
 
         // Update the position of each point (segment) in the list of segments
         for (int i = 0; i < this.segmentLength; i++)
@@ -87,15 +114,44 @@ public class MorningStarWhip : MonoBehaviour
             Vector2 velocity = firstSegment.posNow - firstSegment.posOld;
             firstSegment.posOld = firstSegment.posNow;
             firstSegment.posNow += velocity;
-            firstSegment.posNow += forceGravity * Time.deltaTime;
+            firstSegment.posNow += forceWhip * Time.deltaTime;
             this.ropeSegments[i] = firstSegment;
         }
 
         // Apply constraints, more iterations will result in a stiffer rope, less iterations will give a springier rope
         for (int i = 0; i < 50; i++)
         {
-           this.ApplyConstraints();
+            this.ApplyConstraints();
         }
+
+        if ((this.ropeSegments[0].posNow - this.ropeSegments[segmentLength-1].posNow).sqrMagnitude >= Mathf.Pow(segmentLength * ropeSegLen,2))
+        {
+            whipped = true;
+        }
+    }
+
+    private void Retract()
+    {
+        // Retract the whip towards the player when not attacking
+        Vector2 towardsPlayer = new Vector2(playerPosition.position.x, playerPosition.position.y);
+
+        // Update the position of each point (segment) in the list of segments
+        for (int i = 0; i < this.segmentLength; i++)
+        {
+            RopeSegment firstSegment = this.ropeSegments[i];
+            Vector2 velocity = firstSegment.posNow - firstSegment.posOld;
+            firstSegment.posOld = firstSegment.posNow;
+            firstSegment.posNow += velocity;
+            firstSegment.posNow += (towardsPlayer - firstSegment.posNow).normalized * 10 * Time.deltaTime;
+            this.ropeSegments[i] = firstSegment;
+        }
+
+        // Apply constraints, more iterations will result in a stiffer rope, less iterations will give a springier rope
+        for (int i = 0; i < 5; i++)
+        {
+            this.ApplyConstraints();
+        }
+
     }
 
     private void ApplyConstraints()
