@@ -20,6 +20,8 @@ public class MorningStarWhip : MonoBehaviour
     private Vector2 directionWhip = new Vector2(0f, 0f);
     // Declare a flag to detect when a whip acction has happened
     private bool whipped = false;
+    // Sprite Rendering
+    public float spriteScale = 1f;
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +48,7 @@ public class MorningStarWhip : MonoBehaviour
     void Update()
     {
         this.DrawRope();
+        //this.DrawWhip();
     }
 
     // Draw the rope
@@ -54,7 +57,7 @@ public class MorningStarWhip : MonoBehaviour
         // Define the width of the line
         float lineWidth = this.lineWidth;
         lineRenderer.startWidth = lineWidth;
-        lineRenderer.endWidth = lineWidth/2;
+        lineRenderer.endWidth = lineWidth;
 
         // Instantiate and assign an arry of vectors to a variable
         Vector3[] ropePositions = new Vector3[this.segmentLength];
@@ -69,6 +72,34 @@ public class MorningStarWhip : MonoBehaviour
         lineRenderer.positionCount = ropePositions.Length;
         // Set the position of each vertice in the line
         lineRenderer.SetPositions(ropePositions);
+    }
+
+    // TODO: Function to add a chain link shader on the whip. It doesnèt work right now.
+    public void DrawWhip()
+    {
+        // Instantiate and assign an arry of vectors to a variable
+        Vector3[] ropePositions = new Vector3[this.segmentLength];
+
+        // For each segment, we add the coordinates of the point to the array
+        for (int i = 0; i < this.segmentLength; i++)
+        {
+            ropePositions[i] = this.ropeSegments[i].posNow;
+        }
+
+        int spriteCount = Mathf.FloorToInt(Vector3.Distance(ropePositions[this.segmentLength-1], ropePositions[0]) / spriteScale);
+
+        Vector3[] positions = new Vector3[] {
+                     transform.position,
+                     (ropePositions[this.segmentLength-1] - ropePositions[0]).normalized * spriteScale * spriteCount
+                 };
+
+        lineRenderer.positionCount = positions.Length;
+        lineRenderer.SetPositions(positions);
+
+        if (lineRenderer.material != null)
+            lineRenderer.material.mainTextureScale = new Vector2(spriteScale * spriteCount, 1);
+        else
+            Debug.LogError(name + "'s Line Renderer has no material!");
     }
 
     // FixedUpdate is called once per fixed framerate frame
