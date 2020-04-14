@@ -3,12 +3,16 @@
 public class WeaponSwitch : MonoBehaviour
 {
     private int selectedWeapon;
+    private Transform uiPreviewTransform;
 
     // Start is called before the first frame update
     void Start()
     {
+        GameObject UiPreview = GameObject.FindGameObjectsWithTag("WeaponPreview")[0];
+        uiPreviewTransform = UiPreview.transform;
         selectedWeapon = 0;
         SelectWeapon();
+        UpdateWeaponUI();
     }
 
     // Update is called once per frame
@@ -46,6 +50,7 @@ public class WeaponSwitch : MonoBehaviour
         if (previousWeapon != selectedWeapon)
         {
             SelectWeapon();
+            UpdateWeaponUI();
         }
     }
 
@@ -59,6 +64,20 @@ public class WeaponSwitch : MonoBehaviour
                 weapon.gameObject.SetActive(true);
             else
                 weapon.gameObject.SetActive(false);
+            i++;
+        }
+    }
+
+    // Update Weapon UI
+    void UpdateWeaponUI()
+    {
+        int i = 0;
+        foreach (Transform uiPreview in uiPreviewTransform)
+        {
+            if (i == selectedWeapon)
+                uiPreview.gameObject.SetActive(true);
+            else
+                uiPreview.gameObject.SetActive(false);
             i++;
         }
     }
