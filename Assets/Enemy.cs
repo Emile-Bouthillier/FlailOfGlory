@@ -5,26 +5,39 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public Rigidbody2D EnemyBody;
-    private float health;
+    private float enemyHealth;
+    private float enemySpeed;
+    private Vector2 enemyDirection;
+
+    private Transform playerPosition;
 
     // Start is called before the first frame update
     void Start()
     {
-        health = 50f;
+        enemyHealth = 50f;
+        enemySpeed = 0.7f;
+        playerPosition = GameObject.Find("Player").GetComponent<Transform>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        //EnemyBody.position
+        enemyDirection = new Vector2(playerPosition.position.x - EnemyBody.position.x, playerPosition.position.y - EnemyBody.position.y).normalized;
+    }
+
+    void FixedUpdate()
+    {
+        // Movement
+        EnemyBody.MovePosition(EnemyBody.position + enemyDirection * enemySpeed * Time.fixedDeltaTime);
     }
 
     public void TakeDamage(float damage)
     {
         SpriteRenderer followerSprite = EnemyBody.gameObject.GetComponent<SpriteRenderer>();
         followerSprite.color = Color.red;
-        health -= damage;
-        if (health <= 0)
+        enemyHealth -= damage;
+        if (enemyHealth <= 0)
         {
             followerSprite.color = Color.black;
         }
