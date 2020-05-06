@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
     private float enemyHealth;
     private float enemySpeed;
     private Vector2 enemyDirection;
+    public Animator animator;
 
     private Transform playerPosition;
 
@@ -22,8 +23,13 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //EnemyBody.position
+        // EnemyBody.position
         enemyDirection = new Vector2(playerPosition.position.x - EnemyBody.position.x, playerPosition.position.y - EnemyBody.position.y).normalized;
+
+        // Animation
+        animator.SetFloat("Horizontal", enemyDirection.x);
+        animator.SetFloat("Vertical", enemyDirection.y);
+        animator.SetFloat("Speed", enemySpeed);
     }
 
     void FixedUpdate()
