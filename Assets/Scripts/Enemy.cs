@@ -13,6 +13,7 @@ public class Enemy : MonoBehaviour
     public Animator animator;
     public Slider slider;
     public GameObject HealthBarUI;
+    public BoxCollider2D EnemyCollider;
 
     private Transform playerPosition;
 
@@ -23,6 +24,8 @@ public class Enemy : MonoBehaviour
         enemySpeed = 0.7f;
         playerPosition = GameObject.Find("Player").GetComponent<Transform>();
         slider.value = calculateHealth();
+        HealthBarUI.SetActive(false);
+        EnemyCollider = GetComponent<BoxCollider2D>();
     }
 
     // Update is called once per frame
@@ -51,7 +54,10 @@ public class Enemy : MonoBehaviour
 
         if (enemyHealth <= 0)
         {
-            Destroy(gameObject);
+            animator.Play("Demon_Death");
+            HealthBarUI.SetActive(false);
+            enemySpeed = 0f;
+            EnemyCollider.enabled = false;
         }
     }
 
